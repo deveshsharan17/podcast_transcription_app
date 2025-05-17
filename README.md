@@ -110,7 +110,7 @@ huggingface-cli download t5-base --local-dir t5_summarization_model --local-dir-
 
 ```bash
 python app.py --help  # view CLI options
-python app.py --input "docs/article.txt" --model bart  # example run
+
 ```
 
 The script will:
