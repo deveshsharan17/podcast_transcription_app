@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pod-In-Sight - AI Powered Podcast Analysis</title>
+    <style>
+        :root {
+            --primary-color: #077A7D;
+            --secondary-color: #7AE2CF;
+            --background-color: #F5EEDD;
+            --text-color: #06202B;
+            --card-background: #ffffff;
+            --navbar-color: #077A7D;
+            --hover-color: #06202B;
+        }
+        
+        body {
+            margin: 0; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+        
+        .navbar {
+            background-color: var(--navbar-color);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: white;
+            box-shadow: 0 2px 8px rgba(6, 32, 43, 0.1);
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 3rem auto;
+            padding: 0 1rem;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+        
+        p.lead {
+            font-size: 1.2rem;
+            line-height: 1.5;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            color: var(--text-color);
+        }
+        
+        form {
+            background: var(--card-background);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(7, 122, 125, 0.15);
+            max-width: 700px;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        
+        input[type="text"], 
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--secondary-color);
+            font-size: 1rem;
+            background-color: white;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(7, 122, 125, 0.1);
+        }
+        
+        .time-range {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .time-range > div {
+            flex: 1;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            border: none;
+            color: white;
+            font-weight: bold;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        button:hover {
+            background-color: var(--hover-color);
+            transform: translateY(-1px);
+        }
+        
+        .flashes {
+            background-color: var(--hover-color);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            list-style: none;
+        }
+        
+        .flashes li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .flashes li:last-child {
+            margin-bottom: 0;
+        }
+
+        select {
+            background-color: white;
+            cursor: pointer;
+        }
+
+        select:hover {
+            border-color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <span>🎙️ Pod-In-Sight</span>
+    </nav>
+
+    <div class="container">
+        <h1>Pod-In-Sight</h1>
+        <p class="lead">
+            Transform your podcast audio into captivating summaries with the power of AI.
+            Get insights, transcripts, and engage with your content through our interactive chat feature.
+        </p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flashes">
+            {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+        {% endwith %}
+        
+        <form method="POST" action="/process">
+            <div class="form-group">
+                <label for="youtube_url">YouTube URL</label>
+                <input type="text" id="youtube_url" name="youtube_url" 
+                       placeholder="Enter podcast YouTube URL" required />
+            </div>
+
+            <div class="time-range">
+                <div>
+                    <label for="start_min">Start Time (minutes)</label>
+                    <input type="number" id="start_min" name="start_min" 
+                           value="0" min="0" required />
+                </div>
+                <div>
+                    <label for="end_min">End Time (minutes)</label>
+                    <input type="number" id="end_min" name="end_min" 
+                           value="5" min="1" required />
+                </div>
+            </div>
+        
+            <div class="form-group">
+                <label for="transcriber_choice">Transcription Model</label>
+                <select id="transcriber_choice" name="transcriber_choice" required>
+                    <option value="Whisper">Whisper (Recommended)</option>
+                    <option value="AssemblyAI">AssemblyAI</option>
+                </select>
+            </div>
+        
+            <div class="form-group">
+                <label for="summariser_choice">Summarization Model</label>
+                <select id="summariser_choice" name="summariser_choice" required>
+                    <option value="GPT">GPT (Best Quality)</option>
+                    <option value="BART">BART</option>
+                    <option value="T5">T5</option>
+                </select>
+            </div>
+        
+            <button type="submit">Generate Summary</button>
+        </form>
+    </div>
+</body>
+</html>

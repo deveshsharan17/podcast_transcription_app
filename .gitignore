@@ -1,0 +1,6 @@
+# Ignore environment files
+.env
+venv/
+outputs/
+bart_summarization_model/
+t5_summarization_model/
